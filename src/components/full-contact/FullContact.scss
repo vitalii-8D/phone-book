@@ -210,4 +210,20 @@
       color: red;
     }
   }
+  .roll-back {
+    position: absolute;
+    left: 30px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    border: 1px solid slateblue;
+    border-radius: 10px;
+    font-size: 20px;
+    color: slateblue;
+    background-color: palegreen;
+    cursor: pointer;
+
+    &:hover {
+      background-color: orange;
+    }
+  }
 }

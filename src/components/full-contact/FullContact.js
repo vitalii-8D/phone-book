@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, createRef} from 'react';
 import {connect} from 'react-redux';
 import {withRouter} from "react-router";
 import {Link} from "react-router-dom";
@@ -9,19 +9,28 @@ import './FullContact.scss';
 
 
 class FullContact extends Component {
-   state = {
-      editMode: false,
-      eraseMode: false,
-      history: []
+   constructor(props) {
+      super(props);
+
+      const {match: {params: {id}}, contacts} = this.props;
+      const contact = contacts.find(item => id === item.id);
+
+      this.state = {
+         editMode: false,
+         eraseMode: false,
+         rollBackMode: false,
+         history: [],
+         contact
+      }
    }
 
    componentDidMount() {
-      const {match: {params: {id}}, contacts} = this.props;
-      const contact = contacts.find(item => id === item.id);
+      const firstContact = JSON.parse(JSON.stringify(this.state.contact));
       this.setState({
-         contact
+         history: [firstContact]
       })
-      debugger
+
+      console.log('Did Mount!!!');
    }
 
    onEditModeChange = (e) => {
@@ -32,21 +41,38 @@ class FullContact extends Component {
    }
 
    onEditField = (result) => () => {
-      if (result) {
+      const {history} = this.state;
+
+      if (!result) {
+         this.setState({
+            contact: history[history.length - 1]
+         })
+      } else {
          const {editContact} = this.props;
-         const {contact: {id}, editMode} = this.state;
+         const {contact} = this.state;
 
          const editObj = {
-            id,
-            property: editMode,
-            value: ''
+            ...contact
          }
+
+         this.setState({
+            history: [...history, contact]
+         })
 
          editContact(editObj);
       }
 
       this.setState({
          editMode: false
+      })
+   }
+
+   onFieldChange = (e) => {
+      const changeTarget = e.currentTarget.name;
+      const changeValue = e.currentTarget.value;
+
+      this.setState({
+         contact: {...this.state.contact, [changeTarget]: changeValue}
       })
    }
 
@@ -64,8 +90,7 @@ class FullContact extends Component {
 
          const editObj = {
             id,
-            property: eraseMode,
-            value: ''
+            [eraseMode]: ''
          }
 
          editContact(editObj);
@@ -74,15 +99,32 @@ class FullContact extends Component {
       this.setState({
          eraseMode: false
       })
+   }
+
+   onRollBackConfirmation = () => {
+      this.setState({
+         rollBackMode: true
+      })
+   }
+
+   onRollBack = () => {
+      const {history} = this.state;
+      if (history.length <= 1) return;
+
+      const newHistory = [...history];
+      newHistory.pop();
+
+      this.setState({
+         contact: newHistory[newHistory.length - 1],
+         history: newHistory
+      })
       debugger
    }
 
    render() {
-      const {contact, editMode, eraseMode} = this.state || {};
+      const {contact, editMode, eraseMode, history} = this.state || {};
       const {name, avatar, phone, email, address} = contact || {};
-      console.log(this.props);
 
-      if (!name || !phone) return null;
       return (
          <div className='full-contact'>
             <div className='full-contact-header'>
@@ -90,7 +132,13 @@ class FullContact extends Component {
                   <div className='full-contact-header-name-value'>{name}</div>
 
                   {(editMode === 'name') &&
-                  <input type="text" name='name' className='edit-input' value={name}/>
+                  <input
+                     type="text"
+                     name='name'
+                     className='edit-input'
+                     value={name}
+                     onChange={this.onFieldChange}
+                  />
                   }
 
                   <div className="buttons-area">
@@ -105,7 +153,7 @@ class FullContact extends Component {
                         </button>
                      )}
                      {(editMode === 'name') && (
-                        <button type='button' className='edit-on name' onClick={this.onEditField(false)}>
+                        <button type='button' className='edit-on name' onClick={this.onEditField(true)}>
                            <i className="fas fa-check"></i>
                         </button>
                      )}
@@ -225,7 +273,7 @@ class FullContact extends Component {
             </div>
 
             <Link to='/contacts' className='back-btn'><i className="fas fa-arrow-left"></i></Link>
-            {/*<button type='button'><i className="fas fa-arrow-left"></i></button>*/}
+            <button type='button' className='roll-back' disabled={history.length <= 1}onClick={this.onRollBack}><i className="fas fa-backward"></i></button>
          </div>
       );
    }
