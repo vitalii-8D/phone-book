@@ -1,10 +1,12 @@
 import React, {Component} from 'react';
-import {ModalWindow} from "../modal-window/ModalWindow";
 import {connect} from 'react-redux';
 import {withRouter} from "react-router";
+import {Link} from "react-router-dom";
+
+import {editContact} from "../../actions";
 
 import './FullContact.scss';
-import {Link} from "react-router-dom";
+
 
 class FullContact extends Component {
    state = {
@@ -17,8 +19,7 @@ class FullContact extends Component {
       const {match: {params: {id}}, contacts} = this.props;
       const contact = contacts.find(item => id === item.id);
       this.setState({
-         contact,
-         history: [contact]
+         contact
       })
       debugger
    }
@@ -30,7 +31,20 @@ class FullContact extends Component {
       })
    }
 
-   onEditModeDisable = () => {
+   onEditField = (result) => () => {
+      if (result) {
+         const {editContact} = this.props;
+         const {contact: {id}, editMode} = this.state;
+
+         const editObj = {
+            id,
+            property: editMode,
+            value: ''
+         }
+
+         editContact(editObj);
+      }
+
       this.setState({
          editMode: false
       })
@@ -44,6 +58,19 @@ class FullContact extends Component {
    }
 
    onEraseField = (result) => () => {
+      if (result) {
+         const {editContact} = this.props;
+         const {contact: {id}, eraseMode} = this.state;
+
+         const editObj = {
+            id,
+            property: eraseMode,
+            value: ''
+         }
+
+         editContact(editObj);
+      }
+
       this.setState({
          eraseMode: false
       })
@@ -59,7 +86,31 @@ class FullContact extends Component {
       return (
          <div className='full-contact'>
             <div className='full-contact-header'>
-               <div className='full-contact-header-name'>{name}</div>
+               <div className='full-contact-header-name'>
+                  <div className='full-contact-header-name-value'>{name}</div>
+
+                  {(editMode === 'name') &&
+                  <input type="text" name='name' className='edit-input' value={name}/>
+                  }
+
+                  <div className="buttons-area">
+                     {!editMode && !eraseMode &&
+                     <button type='button' className='edit-btn name' onClick={this.onEditModeChange}>
+                        <i className="fas fa-edit"></i>
+                     </button>}
+
+                     {(editMode === 'name') && (
+                        <button type='button' className='edit-off name' onClick={this.onEditField(false)}>
+                           <i className="fas fa-times"></i>
+                        </button>
+                     )}
+                     {(editMode === 'name') && (
+                        <button type='button' className='edit-on name' onClick={this.onEditField(false)}>
+                           <i className="fas fa-check"></i>
+                        </button>
+                     )}
+                  </div>
+               </div>
                <div className='full-contact-header-image'>
                   <img src={avatar} alt={name}/>
                </div>
@@ -82,8 +133,13 @@ class FullContact extends Component {
                      )}
 
                      {(editMode === 'phone') && (
-                        <button type='button' className='edit-off phone' onClick={this.onEditModeDisable}>
+                        <button type='button' className='edit-off phone' onClick={this.onEditField(false)}>
                            <i className="fas fa-times"></i>
+                        </button>
+                     )}
+                     {(editMode === 'phone') && (
+                        <button type='button' className='edit-on phone' onClick={this.onEditField(false)}>
+                           <i className="fas fa-check"></i>
                         </button>
                      )}
                   </div>
@@ -95,7 +151,7 @@ class FullContact extends Component {
                   {(eraseMode === 'email') && (
                      <div className="confirm-erase-window">
                         <div>Erase this field?</div>
-                        <button className="erase-yes" onClick={this.onEraseField('email')}>Yes</button>
+                        <button className="erase-yes" onClick={this.onEraseField(true)}>Yes</button>
                         <button className="erase-no" onClick={this.onEraseField(false)}>No</button>
                      </div>
                   )}
@@ -105,16 +161,24 @@ class FullContact extends Component {
                   )}
 
                   <div className='buttons-area'>
-                     {!editMode && !eraseMode && <button type='button' className='edit-btn email' onClick={this.onEditModeChange}>
+                     {!editMode && !eraseMode &&
+                     <button type='button' className='edit-btn email' onClick={this.onEditModeChange}>
                         <i className="fas fa-edit"></i>
                      </button>}
-                     {!editMode && !eraseMode && <button type='button' className='erase-btn email' onClick={this.onEraseConfirmation}>
+                     {!editMode && !eraseMode &&
+                     <button type='button' className='erase-btn email' onClick={this.onEraseConfirmation}
+                             disabled={!email}>
                         <i className="fas fa-trash-alt"></i>
                      </button>}
 
                      {(editMode === 'email') && (
-                        <button type='button' className='edit-off email' onClick={this.onEditModeDisable}>
+                        <button type='button' className='edit-off email' onClick={this.onEditField(false)}>
                            <i className="fas fa-times"></i>
+                        </button>
+                     )}
+                     {(editMode === 'email') && (
+                        <button type='button' className='edit-on email' onClick={this.onEditField(false)}>
+                           <i className="fas fa-check"></i>
                         </button>
                      )}
                   </div>
@@ -126,7 +190,7 @@ class FullContact extends Component {
                   {(eraseMode === 'address') && (
                      <div className="confirm-erase-window">
                         <div>Erase this field?</div>
-                        <button className="erase-yes" onClick={this.onEraseField('address')}>Yes</button>
+                        <button className="erase-yes" onClick={this.onEraseField(true)}>Yes</button>
                         <button className="erase-no" onClick={this.onEraseField(false)}>No</button>
                      </div>
                   )}
@@ -136,16 +200,24 @@ class FullContact extends Component {
                   )}
 
                   <div className='buttons-area'>
-                     {!editMode && !eraseMode && <button type='button' className='edit-btn address' onClick={this.onEditModeChange}>
+                     {!editMode && !eraseMode &&
+                     <button type='button' className='edit-btn address' onClick={this.onEditModeChange}>
                         <i className="fas fa-edit"></i>
                      </button>}
-                     {!editMode && !eraseMode && <button type='button' className='erase-btn address' onClick={this.onEraseConfirmation}>
+                     {!editMode && !eraseMode &&
+                     <button type='button' className='erase-btn address' onClick={this.onEraseConfirmation}
+                             disabled={!address}>
                         <i className="fas fa-trash-alt"></i>
                      </button>}
 
                      {(editMode === 'address') && (
-                        <button type='button' className='edit-off address' onClick={this.onEditModeDisable}>
+                        <button type='button' className='edit-off address' onClick={this.onEditField(false)}>
                            <i className="fas fa-times"></i>
+                        </button>
+                     )}
+                     {(editMode === 'address') && (
+                        <button type='button' className='edit-on address' onClick={this.onEditField(false)}>
+                           <i className="fas fa-check"></i>
                         </button>
                      )}
                   </div>
@@ -153,6 +225,7 @@ class FullContact extends Component {
             </div>
 
             <Link to='/contacts' className='back-btn'><i className="fas fa-arrow-left"></i></Link>
+            {/*<button type='button'><i className="fas fa-arrow-left"></i></button>*/}
          </div>
       );
    }
@@ -166,4 +239,8 @@ const mapStateToProps = (state) => {
    }
 }
 
-export default withRouter(connect(mapStateToProps)(FullContact));
+const mapDispatchToProps = {
+   editContact
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(FullContact));

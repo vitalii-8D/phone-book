@@ -23,6 +23,11 @@
     &-name {
       margin: 20px auto 10px;
       font-size: 28px;
+      position: relative;
+
+      &-value {
+        display: inline-block;
+      }
     }
 
     &::after {
@@ -35,6 +40,49 @@
       width: 300px;
       height: 3px;
       background-color: #333333;
+    }
+
+    .buttons-area {
+      text-align: left;
+      display: inline-block;
+      width: 100px;
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%);
+      left: 80%;
+
+      button {
+        border: none;
+        font-size: 18px;
+        padding: 5px 10px;
+        cursor: pointer;
+
+        &.edit-btn {
+          color: green;
+        }
+        &.edit-off {
+          color: red;
+        }
+        &.edit-on {
+          color: green;
+        }
+
+        &:hover {
+          background-color: #dddddd;
+        }
+        &:focus {
+          border: none;
+          outline: none;
+        }
+      }
+    }
+
+    .edit-input {
+      width: 220px;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 80px;
     }
   }
 
