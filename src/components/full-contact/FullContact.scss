@@ -225,5 +225,11 @@
     &:hover {
       background-color: orange;
     }
+    &:disabled,
+    &:disabled:hover {
+      background-color: #EEEEEE;
+      border-color: #EEEEEE;
+      color: #EEEEEE;
+    }
   }
 }

@@ -86,12 +86,18 @@ class FullContact extends Component {
    onEraseField = (result) => () => {
       if (result) {
          const {editContact} = this.props;
-         const {contact: {id}, eraseMode} = this.state;
+
+         const {contact, history, eraseMode} = this.state;
 
          const editObj = {
-            id,
-            [eraseMode]: ''
+            ...contact
          }
+         editObj[eraseMode] = '';
+
+         this.setState({
+            history: [...history, contact],
+            contact: editObj
+         })
 
          editContact(editObj);
       }
@@ -170,7 +176,7 @@ class FullContact extends Component {
                   <div className='full-contact-info-phone-value value'>{phone}</div>
 
                   {(editMode === 'phone') && (
-                     <input type="text" name='phone' className='edit-input' value={phone}/>
+                     <input type="text" name='phone' className='edit-input' value={phone} onChange={this.onFieldChange}/>
                   )}
 
                   <div className='buttons-area'>
@@ -186,7 +192,7 @@ class FullContact extends Component {
                         </button>
                      )}
                      {(editMode === 'phone') && (
-                        <button type='button' className='edit-on phone' onClick={this.onEditField(false)}>
+                        <button type='button' className='edit-on phone' onClick={this.onEditField(true)}>
                            <i className="fas fa-check"></i>
                         </button>
                      )}
@@ -205,7 +211,7 @@ class FullContact extends Component {
                   )}
 
                   {(editMode === 'email') && (
-                     <input type="text" name='email' className='edit-input' value={email}/>
+                     <input type="text" name='email' className='edit-input' value={email} onChange={this.onFieldChange}/>
                   )}
 
                   <div className='buttons-area'>
@@ -225,7 +231,7 @@ class FullContact extends Component {
                         </button>
                      )}
                      {(editMode === 'email') && (
-                        <button type='button' className='edit-on email' onClick={this.onEditField(false)}>
+                        <button type='button' className='edit-on email' onClick={this.onEditField(true)}>
                            <i className="fas fa-check"></i>
                         </button>
                      )}
@@ -244,7 +250,7 @@ class FullContact extends Component {
                   )}
 
                   {(editMode === 'address') && (
-                     <input type="text" name='address' className='edit-input' value={address}/>
+                     <input type="text" name='address' className='edit-input' value={address} onChange={this.onFieldChange}/>
                   )}
 
                   <div className='buttons-area'>
@@ -264,7 +270,7 @@ class FullContact extends Component {
                         </button>
                      )}
                      {(editMode === 'address') && (
-                        <button type='button' className='edit-on address' onClick={this.onEditField(false)}>
+                        <button type='button' className='edit-on address' onClick={this.onEditField(true)}>
                            <i className="fas fa-check"></i>
                         </button>
                      )}
