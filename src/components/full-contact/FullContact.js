@@ -6,6 +6,7 @@ import {Link} from "react-router-dom";
 import {editContact} from "../../actions";
 
 import './FullContact.scss';
+import {parse} from "@fortawesome/fontawesome-svg-core";
 
 
 class FullContact extends Component {
@@ -88,17 +89,18 @@ class FullContact extends Component {
          const {editContact} = this.props;
 
          const {contact, history, eraseMode} = this.state;
-
-         const editObj = {
-            ...contact
-         }
+         debugger
+         const editObj = JSON.parse(JSON.stringify(contact))
          editObj[eraseMode] = '';
+         debugger
 
+         const newHistory = JSON.parse(JSON.stringify(history));
+         newHistory.push(contact)
          this.setState({
-            history: [...history, contact],
+            history: newHistory,
             contact: editObj
          })
-
+         debugger
          editContact(editObj);
       }
 
@@ -107,24 +109,20 @@ class FullContact extends Component {
       })
    }
 
-   onRollBackConfirmation = () => {
-      this.setState({
-         rollBackMode: true
-      })
-   }
-
    onRollBack = () => {
       const {history} = this.state;
+      const {editContact} = this.props;
       if (history.length <= 1) return;
-
+      debugger
       const newHistory = [...history];
       newHistory.pop();
-
+      debugger
       this.setState({
          contact: newHistory[newHistory.length - 1],
          history: newHistory
       })
       debugger
+      editContact(newHistory[newHistory.length - 1]);
    }
 
    render() {
